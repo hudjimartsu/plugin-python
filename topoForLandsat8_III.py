@@ -9,6 +9,7 @@ from scipy.stats import linregress
 import pandas as pd
 from dict import dict
 #Load Metadata
+
 f = open('D:/PROJECT/FOREST 2020/TRAINING/PyQgis/DATA/Landsat8/clip/mtl.txt', 'r') #open file for reading
 def build_data(f):
     output = {}
