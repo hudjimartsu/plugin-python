@@ -9,7 +9,6 @@ from scipy.stats import linregress
 import pandas as pd
 from dict import dict
 #Load Metadata
-
 f = open('D:/PROJECT/FOREST 2020/TRAINING/PyQgis/DATA/Landsat8/clip/mtl.txt', 'r') #open file for reading
 def build_data(f):
     output = {}
@@ -19,7 +18,6 @@ def build_data(f):
             output[l[0].strip()] = l[1].strip()
     return output
 data = build_data(f)
-
 #Load data raster
 raster_list=glob.glob('D:\PROJECT\FOREST 2020\TRAINING\PyQgis\DATA\Landsat8\NEW\*.tif')
 read=[]
