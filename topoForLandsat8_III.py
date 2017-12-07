@@ -9,7 +9,7 @@ from scipy.stats import linregress
 import pandas as pd
 from dict import dict
 #Load Metadata
-
+#metadata digunakan sebagai inputan function (year_date, hour, second, leap)
 f = open('D:/PROJECT/FOREST 2020/TRAINING/PyQgis/DATA/Landsat8/clip/mtl.txt', 'r') #open file for reading
 def build_data(f):
     output = {}
@@ -19,7 +19,8 @@ def build_data(f):
             output[l[0].strip()] = l[1].strip()
     return output
 data = build_data(f)
-#Load data raster
+
+#Load data raster yang akan dikoreksi
 raster_list=glob.glob('D:\PROJECT\FOREST 2020\TRAINING\PyQgis\DATA\Landsat8\NEW\*.tif')
 read=[]
 for i in raster_list:
@@ -28,6 +29,7 @@ for i in raster_list:
 data_name=['band2', 'band5', 'band6']
 my_dict= dict(zip(data_name, read))
 
+#Load data raster aspect, slope & sample area
 raster_list_dem=glob.glob('D:\PROJECT\FOREST 2020\TRAINING\PyQgis\DATA\Landsat8\NEW\DEM\*.tif')
 read2=[]
 for d in raster_list_dem:
@@ -132,7 +134,7 @@ b_true=area_true[1]
 cos_zenith= cos(zenit_angle)
 
 #auto
-#def IC_all(my_dict):
+
     temp={}
     IC_final={}
     for y in my_dict:
@@ -141,9 +143,9 @@ cos_zenith= cos(zenit_angle)
         IC_true=IC[a_true,b_true].ravel()
         slope=linregress(IC_true, temp[y])
         IC_final[y]=my_dict[y]-(slope[0]*(IC-cos_zenith))
-        #return IC_final
-#IC_new=IC_final(my_dict)
-#export auto
+
+
+#export data to raster (GeoTiff) masih perband, blm bisa dilooping untuk export sekaligus 2 atau lebih
 geo = band.GetGeoTransform()
 proj = band.GetProjection()
 shape = my_dict['band2'].shape
@@ -155,8 +157,7 @@ dst_ds.GetRasterBand(1).WriteArray(IC_final['band2'])
 dst_ds.FlushCache()
 dst_ds = None  # save, close"""
 
-#CSV
-#corrected
+#function untuk export ke CSV
 
 def csv():
     csv2 = {}
