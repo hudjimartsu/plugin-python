@@ -148,12 +148,10 @@ geo = band.GetGeoTransform()
 proj = band.GetProjection()
 shape = my_dict['band2'].shape
 driver = gdal.GetDriverByName("GTiff")
-dst_ds = driver.Create("D:\PROJECT\FOREST 2020\TRAINING\PyQgis\RESULT\Landsat8\L011117\Coba5.tif", shape[1], shape[0], 3, gdal.GDT_Float32)
+dst_ds = driver.Create("D:\PROJECT\FOREST 2020\TRAINING\PyQgis\RESULT\Landsat8\L011117\Coba5.tif", shape[1], shape[0], 1, gdal.GDT_Float32)
 dst_ds.SetGeoTransform(geo)
 dst_ds.SetProjection(proj)
 dst_ds.GetRasterBand(1).WriteArray(IC_final['band2'])
-dst_ds.GetRasterBand(2).WriteArray(IC_final['band5'])
-dst_ds.GetRasterBand(3).WriteArray(IC_final['band6'])
 dst_ds.FlushCache()
 dst_ds = None  # save, close"""
 
