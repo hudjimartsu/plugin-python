@@ -7,7 +7,7 @@ from osgeo import gdal
 from scipy.stats import linregress
 import pandas as pd
 #Load Metadata
-f = open('D:/PROJECT/FOREST 2020/TRAINING/PyQgis/DATA/Landsat8/clip/mtl.txt', 'r') #open file for reading
+f = open('E:\Karya\plugin-python\DATA\NEW\clip\mtl.txt', 'r') #open file for reading
 def build_data(f):
     output = {}
     for line in f.readlines():
@@ -18,7 +18,7 @@ def build_data(f):
 data = build_data(f)
 
 #Load data raster
-raster_list2=glob.glob('D:\PROJECT\FOREST 2020\TRAINING\PyQgis\DATA\Landsat8\clip\*.tif')
+raster_list2=glob.glob('\Karya\plugin-python\DATA\clip\*.tif')
 read=[]
 for i in raster_list2:
     band=gdal.Open(i)
@@ -157,7 +157,7 @@ geo = band.GetGeoTransform()
 proj = band.GetProjection()
 shape = band2.shape
 driver = gdal.GetDriverByName("GTiff")
-dst_ds = driver.Create("D:\PROJECT\FOREST 2020\TRAINING\PyQgis\RESULT\Landsat8\L111017\R2\Band2R_IC.tif", shape[1], shape[0], 1, gdal.GDT_Float32)
+dst_ds = driver.Create("E:\Karya\plugin-python\DATA\OUT\Band2R_IC.tif", shape[1], shape[0], 1, gdal.GDT_Float32)
 dst_ds.SetGeoTransform(geo)
 dst_ds.SetProjection(proj)
 dst_ds.GetRasterBand(1).WriteArray(IC_2)
@@ -174,4 +174,4 @@ IC_6R=IC_6D.ravel()
 
 
 df=pd.DataFrame({'IC':b,'band2un':a,'band2corr':IC_2R,'band5un':band5_R,'band5corr':IC_5R,'band6un':band6_R,'band6corr':IC_6R })
-df.to_csv('D:\PROJECT\FOREST 2020\TRAINING\PyQgis\RESULT\Landsat8\L111017\R2\sample4.csv', index=False)
+df.to_csv('E:\Karya\plugin-python\DATA\OUT\sample4.csv', index=False)

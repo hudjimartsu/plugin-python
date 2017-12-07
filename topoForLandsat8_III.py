@@ -10,7 +10,7 @@ import pandas as pd
 from dict import dict
 #Load Metadata
 #metadata digunakan sebagai inputan function (year_date, hour, second, leap)
-f = open('D:/PROJECT/FOREST 2020/TRAINING/PyQgis/DATA/Landsat8/clip/mtl.txt', 'r') #open file for reading
+f = open('E:\Karya\plugin-python\DATA\NEW\mtl.txt', 'r') #open file for reading
 def build_data(f):
     output = {}
     for line in f.readlines():
@@ -21,7 +21,8 @@ def build_data(f):
 data = build_data(f)
 
 #Load data raster yang akan dikoreksi
-raster_list=glob.glob('D:\PROJECT\FOREST 2020\TRAINING\PyQgis\DATA\Landsat8\NEW\*.tif')
+raster_list=glob.glob('E:\Karya\plugin-python\DATA\NEW\*.tif')
+print(raster_list)
 read=[]
 for i in raster_list:
     band=gdal.Open(i)
@@ -30,7 +31,7 @@ data_name=['band2', 'band5', 'band6']
 my_dict= dict(zip(data_name, read))
 
 #Load data raster aspect, slope & sample area
-raster_list_dem=glob.glob('D:\PROJECT\FOREST 2020\TRAINING\PyQgis\DATA\Landsat8\NEW\DEM\*.tif')
+raster_list_dem=glob.glob('E:\Karya\plugin-python\DATA\NEW\DEM\*.tif')
 read2=[]
 for d in raster_list_dem:
     band=gdal.Open(d)
@@ -87,6 +88,7 @@ decl_deg= (360 / (2 * math.pi)) * decl
 
 #lat long value
 # get columns and rows of your image from gdalinfo
+
 xoff, a, b, yoff, d, e = band.GetGeoTransform()
 def pixel2coord(x, y):
     xp = a * x + b * y + xoff
@@ -135,27 +137,31 @@ cos_zenith= cos(zenit_angle)
 
 #auto
 
-    temp={}
-    IC_final={}
-    for y in my_dict:
-        val2=my_dict[y]
-        temp[y]=val2[a_true,b_true].ravel()
-        IC_true=IC[a_true,b_true].ravel()
-        slope=linregress(IC_true, temp[y])
-        IC_final[y]=my_dict[y]-(slope[0]*(IC-cos_zenith))
+temp={}
+IC_final={}
+for y in my_dict:
+    val2=my_dict[y]
+    temp[y]=val2[a_true,b_true].ravel()
+    IC_true=IC[a_true,b_true].ravel()
+    slope=linregress(IC_true, temp[y])
+    IC_final[y]=my_dict[y]-(slope[0]*(IC-cos_zenith))
 
-
+print(IC_final)
 #export data to raster (GeoTiff) masih perband, blm bisa dilooping untuk export sekaligus 2 atau lebih
-geo = band.GetGeoTransform()
-proj = band.GetProjection()
-shape = my_dict['band2'].shape
-driver = gdal.GetDriverByName("GTiff")
-dst_ds = driver.Create("D:\PROJECT\FOREST 2020\TRAINING\PyQgis\RESULT\Landsat8\L011117\Coba5.tif", shape[1], shape[0], 1, gdal.GDT_Float32)
-dst_ds.SetGeoTransform(geo)
-dst_ds.SetProjection(proj)
-dst_ds.GetRasterBand(1).WriteArray(IC_final['band2'])
-dst_ds.FlushCache()
-dst_ds = None  # save, close"""
+for item in IC_final:
+    print(item)
+    geo = band.GetGeoTransform()
+    proj = band.GetProjection()
+    shape = my_dict['band2'].shape
+    driver = gdal.GetDriverByName("GTiff")
+    dst_ds = driver.Create("E:/Karya/plugin-python/DATA/OUT/"+item+".tif", shape[1], shape[0], 1, gdal.GDT_Float32)
+    dst_ds.SetGeoTransform(geo)
+    dst_ds.SetProjection(proj)
+    dst_ds.GetRasterBand(1).WriteArray(IC_final[y])
+    dst_ds.FlushCache()
+    dst_ds = None  # save, close"""
+
+
 
 #function untuk export ke CSV
 
@@ -169,4 +175,4 @@ def csv():
         df2=pd.DataFrame(temp)
         df3=pd.DataFrame({'IC':IC_true})
         dfn=pd.concat([df3, df, df2], axis=1)
-        dfn.to_csv("D:\PROJECT\FOREST 2020\TRAINING\PyQgis\RESULT\Landsat8\L301017\sample.csv", index= False)
+        dfn.to_csv("E:\Karya\plugin-python\DATA\OUT\sample.csv", index= False)
