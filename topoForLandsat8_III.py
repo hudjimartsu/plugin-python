@@ -10,7 +10,9 @@ import pandas as pd
 from dict import dict
 #Load Metadata
 #metadata digunakan sebagai inputan function (year_date, hour, second, leap)
-f = open('E:\Karya\plugin-python\DATA\NEW\mtl.txt', 'r') #open file for reading
+path_f = 'E:\Karya\plugin-python\DATA\NEW\*.txt'#open file for reading
+glob_f= glob.glob(path_f)
+f=open(glob_f[1])
 def build_data(f):
     output = {}
     for line in f.readlines():
@@ -21,24 +23,32 @@ def build_data(f):
 data = build_data(f)
 
 #Load data raster yang akan dikoreksi
-raster_list=glob.glob('E:\Karya\plugin-python\DATA\NEW\*.tif')
-print(raster_list)
+path = 'E:\Karya\plugin-python\DATA\NEW\'
+raster_list=glob.glob(path + '*.tif')
 read=[]
 for i in raster_list:
     band=gdal.Open(i)
     read.append(band.GetRasterBand(1).ReadAsArray())
-data_name=['band2', 'band5', 'band6']
-my_dict= dict(zip(data_name, read))
+filename=[]
+for a in [os.path.basename(x) for x in glob.glob(path + '*.tif')]:
+    p=os.path.splitext(a)[0]
+    filename.append(p)
+my_dict= dict(zip(filename, read))
 
 #Load data raster aspect, slope & sample area
-raster_list_dem=glob.glob('E:\Karya\plugin-python\DATA\NEW\DEM\*.tif')
+pathname= 'E:\Karya\plugin-python\DATA\NEW\DEM\*.tif'
+raster_list_dem=glob.glob(pathname)
 read2=[]
 for d in raster_list_dem:
     band=gdal.Open(d)
     read2.append(band.GetRasterBand(1).ReadAsArray())
 
-dem_name=['aspect', 'sample', 'slope']
-dem_dict= dict (zip(dem_name, read2))
+filename_dem=[]
+for b in [os.path.basename(z) for z in glob.glob(pathname)]:
+    c=os.path.splitext(b)[0]
+    filename_dem.append(c)
+
+dem_dict= dict(zip(filename_dem, read2))
 
 def year_date():
     year_file=data['DATE_ACQUIRED']
@@ -128,7 +138,7 @@ delta=azimuth_angle - dem_dict['aspect']
 IC=(cos(zenit_angle)* cos (dem_dict['slope'])) + (sin(zenit_angle) * sin (dem_dict['slope']) * cos(delta))#radians
 
 # sample
-area_true= dem_dict['sample'].nonzero() #outputnya index row n col
+area_true= dem_dict['sample2'].nonzero() #outputnya index row n col
 a_true=area_true[0]
 b_true=area_true[1]
 
@@ -157,7 +167,7 @@ for item in IC_final:
     dst_ds = driver.Create("E:/Karya/plugin-python/DATA/OUT/"+item+".tif", shape[1], shape[0], 1, gdal.GDT_Float32)
     dst_ds.SetGeoTransform(geo)
     dst_ds.SetProjection(proj)
-    dst_ds.GetRasterBand(1).WriteArray(IC_final[y])
+    dst_ds.GetRasterBand(1).WriteArray(IC_final[item])
     dst_ds.FlushCache()
     dst_ds = None  # save, close"""
 
