@@ -7,12 +7,11 @@ import os
 from osgeo import gdal
 from scipy.stats import linregress
 import pandas as pd
-from dict import dict
 #Load Metadata
 #metadata digunakan sebagai inputan function (year_date, hour, second, leap)
-path_f = 'E:\Karya\plugin-python\DATA\NEW\*.txt'#open file for reading
+path_f = './Data/NEW/*.txt'
 glob_f= glob.glob(path_f)
-f=open(glob_f[1])
+f=open(glob_f[0])
 def build_data(f):
     output = {}
     for line in f.readlines():
@@ -23,7 +22,7 @@ def build_data(f):
 data = build_data(f)
 
 #Load data raster yang akan dikoreksi
-path = 'E:\Karya\plugin-python\DATA\NEW\'
+path = './Data/NEW/'
 raster_list=glob.glob(path + '*.tif')
 read=[]
 for i in raster_list:
@@ -36,13 +35,12 @@ for a in [os.path.basename(x) for x in glob.glob(path + '*.tif')]:
 my_dict= dict(zip(filename, read))
 
 #Load data raster aspect, slope & sample area
-pathname= 'E:\Karya\plugin-python\DATA\NEW\DEM\*.tif'
+pathname= './Data/NEW/DEM/*.tif'
 raster_list_dem=glob.glob(pathname)
 read2=[]
 for d in raster_list_dem:
     band=gdal.Open(d)
     read2.append(band.GetRasterBand(1).ReadAsArray())
-
 filename_dem=[]
 for b in [os.path.basename(z) for z in glob.glob(pathname)]:
     c=os.path.splitext(b)[0]
@@ -164,7 +162,7 @@ for item in IC_final:
     proj = band.GetProjection()
     shape = my_dict['band2'].shape
     driver = gdal.GetDriverByName("GTiff")
-    dst_ds = driver.Create("E:/Karya/plugin-python/DATA/OUT/"+item+".tif", shape[1], shape[0], 1, gdal.GDT_Float32)
+    dst_ds = driver.Create("./DATA/OUT/"+item+".tif", shape[1], shape[0], 1, gdal.GDT_Float32)
     dst_ds.SetGeoTransform(geo)
     dst_ds.SetProjection(proj)
     dst_ds.GetRasterBand(1).WriteArray(IC_final[item])
@@ -185,4 +183,4 @@ def csv():
         df2=pd.DataFrame(temp)
         df3=pd.DataFrame({'IC':IC_true})
         dfn=pd.concat([df3, df, df2], axis=1)
-        dfn.to_csv("E:\Karya\plugin-python\DATA\OUT\sample.csv", index= False)
+        dfn.to_csv("./DATA/OUT/sample.csv", index= False)
